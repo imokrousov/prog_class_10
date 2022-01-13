@@ -10,6 +10,10 @@ struct Line2D{	double A,B,C;};
 Line2D makeLine (Point2D M, Point2D N);
 double distance (Line2D l, Point2D M);
 double distance (Point2D M, Point2D N);
+bool onOneSide (Line2D l, Point2D M, Point2D N);
+Line2D makeOrtoLine (Line2D l, Point2D M);
+bool isParalel (Line2D l1, Line2D l2);
+Point2D intersection (Line2D l1, Line2D l2);
 
 int main()
 {
@@ -19,6 +23,35 @@ int main()
 	Line2D l = makeLine(A,B);
 	cout<<l.A<<' '<<l.B<<' '<<l.C<<endl;
 	return 0;
+}
+bool isParalel (Line2D l1, Line2D l2)
+{
+	return l1.A*l2.B == l1.B*l2.A;
+}
+
+Point2D intersection (Line2D l1, Line2D l2)
+{
+	Point2D ans;
+	double znam = l1.A*l2.B - l2.A*l1.B;
+	ans.x = (l1.B*l2.C - l2.B*l1.C)/ znam;
+	ans.y = (l2.A*l1.C - l1.A*l2.C)/ znam;
+	return ans;
+}
+
+
+
+Line2D makeOrtoLine (Line2D l, Point2D M)
+{
+	Line2D ans;
+	ans.A = l.B;
+	ans.B = -l.A;
+	ans.C = l.A*M.y - l.B*M.x;
+	return ans;
+}
+
+bool onOneSide (Line2D l, Point2D M, Point2D N)
+{
+	return (l.A*M.x+l.B*M.y+l.C)*(l.A*N.x+l.B*N.y+l.C) > 0;
 }
 
 double distance (Point2D M, Point2D N)
@@ -46,16 +79,4 @@ double angle (Line2D l1, Line2D l2)
 	return acos ((l1.A*l2.A + l1.B*l2.B)/ 
 	(sqrt(l1.A*l1.A + l1.B*l1.B)*sqrt(l2.A*l2.A + l2.B*l2.B)) );
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
