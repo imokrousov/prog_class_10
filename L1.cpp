@@ -17,13 +17,18 @@ struct L1 {
 	unsigned int size;
 };
 
-void init (L1 & list);
-Node * make_node (int key);
-void push_front(L1 & list, int key);
-void push_back(L1 & list, int key);
-Node* get_by_index(L1 & list, int index);
-void push_by_index(L1 & list, int index, int key);
-void print(L1 & list);
+void init (L1 & list); // O(1)
+Node * make_node (int key); // O(1)
+void push_front(L1 & list, int key); // O(1)
+void push_back(L1 & list, int key); // O(1)
+Node* get_by_index(L1 & list, int index); // O(n)
+void push_by_index(L1 & list, int index, int key); // O(n)
+void print(L1 & list); // O(n)
+void pop_front(L1 & list); // O(1)
+void pop_back(L1 & list); // O(n)
+void pop_by_index(L1 & list, int index); // O(n)
+int front(L1 & list); // O(1)
+int back(L1 & list); // O(1)
 
 
 
@@ -36,7 +41,80 @@ int main()
 	print(A);
 	push_by_index(A,3, -10);
 	print(A);
+	pop_front(A);
+	print(A);
+	pop_back(A);
+	print(A);
+	pop_by_index(A,1);
+	print(A);
 	return 0;
+}
+
+int front(L1 & list){
+	if (list.size == 0){
+		cerr<< "Try to get value from an empty list"<<endl;
+		return 2e9;
+	}
+	return list.head->v;
+}
+
+int back(L1 & list){
+	if (list.size == 0){
+		cerr<< "Try to get value from an empty list"<<endl;
+		return 2e9;
+	}
+	return list.tail->v;
+}
+
+
+void pop_by_index(L1 & list, int index){
+	if (list.size == 0){
+		cerr<< "Try to pop_back from an empty list"<<endl;
+		return;
+	}
+	if (index < 0 || index >= list.size) {
+		cerr<< "Bad index of pop_by_index"<<endl;
+		return;
+	}
+	if (list.size == 1 || index == 0) {
+		pop_front(list);
+		return;
+	}
+	Node * p = get_by_index(list, index-1);
+	Node * del = p->next;
+	Node * q = del->next;
+	p->next = q;
+	delete del;
+	if (index == list.size-1) list.tail = p;
+	list.size--;
+	return;
+}
+
+
+void pop_back(L1 & list){
+	if (list.size == 0){
+		cerr<< "Try to pop_back from an empty list"<<endl;
+		return;
+	}
+	if (list.size == 1) {
+		pop_front(list);
+		return;
+	}
+	pop_by_index(list, list.size -1);
+	return;
+}
+
+void pop_front(L1 & list){
+	if (list.size == 0){
+		cerr<< "Try to pop_front from an empty list"<<endl;
+		return;
+	}
+	Node * tmp = list.head;
+	list.head = list.head->next;
+	delete tmp;
+	if (list.size == 1) list.tail = NULL;
+	list.size--;
+	return;
 }
 
 void print(L1 & list){
