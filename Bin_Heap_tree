@@ -1,0 +1,113 @@
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
+
+using namespace std;
+
+#define elem_t int
+#define NaV -2e9
+
+struct Node {
+	elem_t v;
+	Node * l, *r, *p;
+};
+
+struct Heap_tree {
+	Node * root;
+	int size;
+};
+
+Node * make_node(elem_t key);
+void init_Heap_tree(Heap_tree & tree);
+elem_t max_elem(Heap_tree & tree);
+void insert(Heap_tree & tree, elem_t key);
+void swap(elem_t & x, elem_t & y );
+void print_tree(Node * root );
+
+int main()
+{
+	Heap_tree A;
+	init_Heap_tree(A);
+	insert(A,100);
+	print_tree(A.root); cout<<endl;
+	insert(A,50);
+	print_tree(A.root); cout<<endl;
+	insert(A,40);
+	print_tree(A.root); cout<<endl;
+	insert(A,3);
+	print_tree(A.root); cout<<endl;
+	insert(A,20);
+	print_tree(A.root); cout<<endl;
+	insert(A,200);
+	print_tree(A.root); cout<<endl;
+	return 0;
+}
+
+void print_tree(Node * root ){
+	if (root == NULL) return;
+	cout<< root->v<<' ';
+	print_tree(root->l);
+	print_tree(root->r);
+	return;
+}
+
+
+void insert(Heap_tree & tree, elem_t key){
+	if (tree.size == 0) {
+		tree.root = make_node(key);
+		tree.size++;
+		return;
+	}
+	Node * pred_ok = NULL;
+	bool dir_is_left; 
+	Node * runner = tree.root;
+	while (runner != NULL){
+		if (runner->v < key)swap(runner->v, key);
+		int coin = rand() %2;
+		pred_ok = runner;
+		if (coin){
+			runner=runner->l;
+			dir_is_left = true;
+		}
+		else {
+			runner= runner->r;
+			dir_is_left = false;
+		}
+	}
+	runner = make_node (key);
+	if (dir_is_left) pred_ok->l = runner;
+	else pred_ok->r = runner;
+	runner->p = pred_ok;
+	tree.size++;
+	return;
+}
+
+
+elem_t max_elem(Heap_tree & tree){
+	if (tree.size == 0) return NaV;
+	return tree.root->v;
+}
+
+void init_Heap_tree(Heap_tree & tree){
+	tree.root = NULL;
+	tree.size = 0;
+	return;
+}
+
+Node * make_node(elem_t key){
+	Node * ans = new Node;
+	ans->v = key;
+	ans->l = ans->r = ans->p = NULL;
+	return ans;
+}
+
+void swap(elem_t & x, elem_t & y ){
+	elem_t tmp = x;
+	x = y;
+	y = tmp;
+	return;
+}
+
+
+
+
