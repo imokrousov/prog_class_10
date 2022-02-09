@@ -10,6 +10,7 @@ using namespace std;
 struct Node {
 	elem_t v;
 	Node * l, *r;
+	int h;
 };
 
 struct BS_tree {
@@ -30,6 +31,9 @@ Node * max (Node * p);
 Node * min (Node * p);
 void erase(BS_tree & t,elem_t key );
 Node* erase(Node * t,elem_t key );
+int height (Node * p);
+void fix_height (Node * p);
+int rec_heigt (Node * p);
 
 int main()
 {
@@ -48,6 +52,23 @@ int main()
 	
 	return 0;
 }
+int rec_heigt (Node * p){
+	if (!p) return 0;
+	return max (rec_heigt(p->l), rec_heigt(p->r)) + 1;
+}
+
+
+
+Node * fix_height (Node * p){
+	if (!p) return NULL;
+	p->h = max(height(p->l), height(p->r) ) + 1;
+	return p;
+}
+
+int height (Node * p) {
+	if (p) return p->h;
+	else return 0;
+}
 
 Node * max (Node * p){
 	if (p==NULL) return NULL;
@@ -57,7 +78,7 @@ Node * max (Node * p){
 Node * min (Node * p){
 	if (p==NULL) return NULL;
 	if (p->l == NULL) return p;
-	return max(p->l);
+	return min(p->l);
 }
 
 void init(BS_tree & t){
@@ -96,24 +117,24 @@ Node * erase(Node * p,elem_t key ){
 		if (!(p->r)){ // Справа пусто
 			Node * tmp = p->l;
 			delete p;
-			return tmp;
+			return fix_height(tmp);
 		}
 		Node * minmax = min(p->r);
 		p->v = minmax->v;
 		p->r = erase(p->r, minmax->v);
-		return p;
+		return fix_height(p);
 	}
 	if (p->v > key) p->l = erase(p->l,key); // Ключ должен быть слева
 	if (p->v < key) p->r = erase(p->r,key); // Ключ должен быть справа
-	return p;
+	return fix_height(p);
 }
 
 Node * insert(Node * p,elem_t key ){
 	if (!p) return make_node(key); // if (p==NULL)
-	if (p->v == key) return p;
+	if (p->v == key) return fix_height(p);
 	if (p->v > key) p->l = insert(p->l,key); // Ключ должен быть слева
 	if (p->v < key) p->r = insert(p->r,key); // Ключ должен быть справа
-	return p;
+	return fix_height(p);
 }
 
 
@@ -153,6 +174,7 @@ Node * make_node(elem_t key){
 	Node * ans = new Node;
 	ans->v = key;
 	ans->l = ans->r = NULL;
+	ans->h = 1; 
 	return ans;
 }
 
