@@ -23,6 +23,9 @@ elem_t max_elem(Heap_tree & tree);
 void insert(Heap_tree & tree, elem_t key);
 void swap(elem_t & x, elem_t & y );
 void print_tree(Node * root );
+void print_lvl_tree(Node * root );
+void pop(Heap_tree & tree);
+int print_slice(Node * root, int lvl );
 
 int main()
 {
@@ -37,10 +40,39 @@ int main()
 	insert(A,3);
 	print_tree(A.root); cout<<endl;
 	insert(A,20);
-	print_tree(A.root); cout<<endl;
+	print_lvl_tree(A.root); cout<<endl;
+	pop(A);
+	print_lvl_tree(A.root); cout<<endl;
 	insert(A,200);
-	print_tree(A.root); cout<<endl;
+	print_lvl_tree(A.root); cout<<endl;
 	return 0;
+}
+
+void pop(Heap_tree & tree){
+	if (tree.size == 0) {
+		cerr<<"Tree is empty, you fool!";
+		return;
+	}
+	Node * runner = tree.root;
+	bool word_with_left;
+	while (runner->l || runner->r ){
+		if (runner->l && runner->r) // Два сына
+			word_with_left = (runner->l->v > runner->r->v);
+		else //Один сын
+			word_with_left =  runner->l;
+		if (word_with_left) {
+			swap (runner->v, runner->l->v );
+			runner = runner->l;
+		}
+		else {
+			swap (runner->v, runner->r->v );
+			runner = runner->r;
+		}
+	}
+	if (word_with_left) runner->p->l = NULL;
+	else runner->p->r = NULL;
+	delete runner;
+	return;
 }
 
 void print_tree(Node * root ){
@@ -48,6 +80,22 @@ void print_tree(Node * root ){
 	cout<< root->v<<' ';
 	print_tree(root->l);
 	print_tree(root->r);
+	return;
+}
+
+int print_slice(Node * root, int lvl ){
+	if (root == NULL) return 0;
+	if (lvl == 0) {
+		cout<< root->v<<' ';
+		return 1;
+	}
+	return print_slice(root->l,lvl-1)+print_slice(root->r,lvl-1);
+}
+
+void print_lvl_tree(Node * root ){
+	int i = 0;
+	while (print_slice(root, i++)!= 0) {cout<<endl;}
+	cout<<endl;
 	return;
 }
 
