@@ -32,26 +32,68 @@ Node * min (Node * p);
 void erase(BS_tree & t,elem_t key );
 Node* erase(Node * t,elem_t key );
 int height (Node * p);
-void fix_height (Node * p);
+Node * fix_height (Node * p);
 int rec_heigt (Node * p);
+Node * right_rotate (Node * x);
+Node * left_rotate (Node * x);
+Node * balanced (Node * p);
+int balance (Node * p);
 
 int main()
 {
 	BS_tree A;
 	init(A);
-	insert(A,5);
+	insert(A,1);
+	print_lvl_tree(A.root);
+	insert(A,2);
+	print_lvl_tree(A.root);
+	insert(A,4);
 	print_lvl_tree(A.root);
 	insert(A,3);
 	print_lvl_tree(A.root);
-	insert(A,10);
-	print_lvl_tree(A.root);
-	insert(A,15);
-	print_lvl_tree(A.root);
-	erase(A,5);
+	erase(A,1);
 	print_lvl_tree(A.root);
 	
 	return 0;
 }
+
+int balance (Node * p){ 
+	return height(p->l) - height(p->r);
+}
+
+Node * balanced (Node * p){
+	if (p==NULL) return NULL;
+	if (balance(p) == 2){
+		if (balance(p->l) == -1) p->l = left_rotate(p->l);
+		return right_rotate(p);
+	}
+	if (balance(p) == -2){
+		if (balance(p->r) == 1) p->r = right_rotate(p->r);
+		return left_rotate(p);
+	}
+	return fix_height(p);
+}
+
+
+Node * right_rotate (Node * x){
+	Node * y = x->l;
+	Node * C = y->r;
+	x->l = C;
+	y->r = fix_height(x);
+	return fix_height(y);
+}
+
+
+Node * left_rotate (Node * x){
+	Node * y = x->r;
+	Node * C = y->l;
+	x->r = C;
+	y->l = fix_height(x);
+	return fix_height(y);
+}
+
+
+
 int rec_heigt (Node * p){
 	if (!p) return 0;
 	return max (rec_heigt(p->l), rec_heigt(p->r)) + 1;
@@ -117,24 +159,24 @@ Node * erase(Node * p,elem_t key ){
 		if (!(p->r)){ // Справа пусто
 			Node * tmp = p->l;
 			delete p;
-			return fix_height(tmp);
+			return balanced(tmp);
 		}
 		Node * minmax = min(p->r);
 		p->v = minmax->v;
 		p->r = erase(p->r, minmax->v);
-		return fix_height(p);
+		return balanced(p);
 	}
 	if (p->v > key) p->l = erase(p->l,key); // Ключ должен быть слева
 	if (p->v < key) p->r = erase(p->r,key); // Ключ должен быть справа
-	return fix_height(p);
+	return balanced(p);
 }
 
 Node * insert(Node * p,elem_t key ){
 	if (!p) return make_node(key); // if (p==NULL)
-	if (p->v == key) return fix_height(p);
+	if (p->v == key) return balanced(p);
 	if (p->v > key) p->l = insert(p->l,key); // Ключ должен быть слева
 	if (p->v < key) p->r = insert(p->r,key); // Ключ должен быть справа
-	return fix_height(p);
+	return balanced(p);
 }
 
 
@@ -184,7 +226,6 @@ void swap(elem_t & x, elem_t & y ){
 	y = tmp;
 	return;
 }
-
 
 
 
