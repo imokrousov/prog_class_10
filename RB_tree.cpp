@@ -1,179 +1,202 @@
-#include <iostream>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <iostream>
 
 using namespace std;
 
 #define elem_t int
 #define NaV -2e9
 
-enum Color {RED, BLACK};
+enum Color { RED, BLACK };
 
 struct Node {
-	elem_t v;
-	Node * l, *r, *p;
-	Color c;
+    elem_t v;
+    Node *l, *r, *p;
+    Color c;
 };
-
 
 struct RB_tree {
-	Node * root;
-	int size;
+    Node *root;
+    int size;
 };
 
-Node * make_NIL(elem_t key);
-void init_RB_tree(RB_tree & tree);
-elem_t max_elem(RB_tree & tree);
-void insert(RB_tree & tree, elem_t key);
-void swap(elem_t & x, elem_t & y );
-void print_tree(Node * root );
-void print_lvl_tree(Node * root );
-void erase(RB_tree & tree, elem_t key);
-int print_slice(Node * root, int lvl );
-bool is_NIL (Node * p);
-void set_NIL (Node * p, elem_t key);
+Node *make_NIL();
+void init_RB_tree(RB_tree &tree);
+void insert(RB_tree &tree, elem_t key);
+void swap(elem_t &x, elem_t &y);
+void print_tree(Node *root);
+void print_lvl_tree(Node *root);
+void erase(RB_tree &tree, elem_t key);
+int print_slice(Node *root, int lvl);
+bool is_NIL(Node *p);
+void set_NIL(Node *p, elem_t key);
+Node *get_grand_p(Node *p);
+Node *get_uncle(Node *p);
+void right_rotate(Node *x);
+void left_rotate(Node *x);
 
-int main()
-{
-	Heap_tree A;
-	init_Heap_tree(A);
-	insert(A,100);
-	print_tree(A.root); cout<<endl;
-	insert(A,50);
-	print_tree(A.root); cout<<endl;
-	insert(A,40);
-	print_tree(A.root); cout<<endl;
-	insert(A,3);
-	print_tree(A.root); cout<<endl;
-	insert(A,20);
-	print_lvl_tree(A.root); cout<<endl;
-	pop(A);
-	print_lvl_tree(A.root); cout<<endl;
-	insert(A,200);
-	print_lvl_tree(A.root); cout<<endl;
-	return 0;
+int main() {
+    RB_tree A;
+    init_RB_tree(A);
+    insert(A, 1);
+    print_lvl_tree(A.root);
+    insert(A, 2);
+    print_lvl_tree(A.root);
+    insert(A, 3);
+    print_lvl_tree(A.root);
+    insert(A, 4);
+    print_lvl_tree(A.root);
+    insert(A, 5);
+    print_lvl_tree(A.root);
+    return 0;
 }
 
-void set_NIL (Node * point, elem_t key){
-	point->v = key;
-	point->c = RED;
-	point->l = make_NIL();
-	point->l->p = point;
-	point->r = make_NIL();
-	point->r->p = point;
-	return;
+Node *get_grand_p(Node *pointer) {
+    if ((pointer != NULL) && (pointer->p != NULL))
+        return pointer->p->p;
+    else
+        return NULL;
 }
 
-bool is_NIL (Node * p){
-	return p->l == NULL && p->r == NULL;
+Node *get_uncle(Node *pointer) {
+    Node *grand_p = get_grand_p(pointer);
+    if (grand_p == NULL) return NULL;
+    if (pointer->p == grand_p->l)
+        return grand_p->r;
+    else
+        return grand_p->l;
 }
 
-void print_tree(Node * root ){
-	if (root == NULL) return;
-	cout<< root->v<<' ';
-	print_tree(root->l);
-	print_tree(root->r);
-	return;
+void set_NIL(Node *point, elem_t key) {
+    point->v = key;
+    point->c = RED;
+    point->l = make_NIL();
+    point->l->p = point;
+    point->r = make_NIL();
+    point->r->p = point;
+    return;
 }
 
-int print_slice(Node * root, int lvl ){
-	if (root == NULL) return 0;
-	if (lvl == 0) {
-		cout<< root->v<<' ';
-		return 1;
-	}
-	return print_slice(root->l,lvl-1)+print_slice(root->r,lvl-1);
+bool is_NIL(Node *p) { return p->l == NULL && p->r == NULL; }
+
+void print_tree(Node *root) {
+    if (root == NULL) return;
+    cout << root->v << ' ';
+    print_tree(root->l);
+    print_tree(root->r);
+    return;
 }
 
-void print_lvl_tree(Node * root ){
-	int i = 0;
-	while (print_slice(root, i++)!= 0) {cout<<endl;}
-	cout<<endl;
-	return;
+int print_slice(Node *root, int lvl) {
+    if (root == NULL) return 0;
+    if (lvl == 0) {
+        cout << "(" << root->v << ',' << root->c << ")";
+        return 1;
+    }
+    return print_slice(root->l, lvl - 1) + print_slice(root->r, lvl - 1);
 }
 
-
-void insert(RB_tree & tree, elem_t key){
-	Node * runner = tree.root;
-	while (!is_NIL(runner)){
-		if (runner->v == key) return;
-		if (runner->v > key) runner = runner->l;
-		else runner = runner->r;
-	}
-	set_NIL(runner,key);	
-	if (runner == tree.root) { // Вставка в корень
-		runner->c = BLACK;
-		return;
-	}
-	while (runner->p->c == RED){
-		if (runner->p->p != NULL) {// Есть дед
-			Node * ded = runner->p->p; 
-			if (runner->p == ded->l)  {
-				Node * dyadya = ded->r;
-				if (dyadya->c == RED) { // Случай 1 перекраски
-					runner->p->c = BLACK;
-					dyadya->c = BLACK;
-					ded->c = RED
-					runner = ded; // Переход наверх
-				}
-				else // Дядя черный
-			}
-		}
-	}
+void print_lvl_tree(Node *root) {
+    int i = 0;
+    while (print_slice(root, i++) != 0) {
+        cout << endl;
+    }
+    cout << endl;
+    return;
 }
 
-void right_rotate (Node * x){
-	Node * predOk = x->p;
-	bool left = (predOk->l == x);
-	Node * y = x->l;
-	Node * C = y->r;
-	x->l = C;
-	C->p = x;
-	y->r = x;
-	x->p = y;
-	if (left) predOk->l = y;
-	else predOk->r = y;
-	y->p = predOk;
+void insert(RB_tree &tree, elem_t key) {
+    Node *runner = tree.root;
+    while (!is_NIL(runner)) {
+        if (runner->v == key) return;
+        if (runner->v > key)
+            runner = runner->l;
+        else
+            runner = runner->r;
+    }
+    set_NIL(runner, key);
+    while (runner) {
+        if (runner->p == NULL) {  // Вставка в корень
+            runner->c = BLACK;
+            return;
+        }
+        if (runner->p->c == BLACK) return;  // Родитель уже черный
+        Node *u = get_uncle(runner);
+        Node *g = get_grand_p(runner);
+        if ((u != NULL) && (u->c == RED)) {  // Красные дядя и отец
+            runner->p->c = BLACK;
+            u->c = BLACK;
+            g->c = RED;
+            runner = g;
+            continue;
+        }
+        // Далее следуют случаи, в которых отец красный, но дядя черный
+        if ((runner == runner->p->r) &&
+            (runner->p == g->l)) {  // Отец слева, дед справа
+            left_rotate(runner->p);
+            runner = runner->l;
+        } else if ((runner == runner->p->l) &&
+                   (runner->p == g->r)) {  // Отец справа, дед слева
+            right_rotate(runner->p);
+            runner = runner->r;
+        }
+        runner->p->c = BLACK;
+        g->c = RED;
+
+        if ((runner == runner->p->l) && (runner->p == g->l))
+            right_rotate(g);
+        else
+            left_rotate(g);
+        if (runner->p->p == NULL) tree.root = runner->p; // Обновление корня после поворота 
+        return;
+    }
 }
 
-
-void left_rotate (Node * x){
-	Node * predOk = x->p;
-	bool left = (predOk->l == x);
-	Node * y = x->r;
-	Node * C = y->l;
-	x->r = C;
-	C->p = x;
-	y->l = x;
-	x->p = y;
-	if (left) predOk->l = y;
-	else predOk->r = y;
-	y->p = predOk;
+void right_rotate(Node *x) {
+    Node *left_ch = x->r;
+    left_ch->p = x->p;
+    if (x->p != NULL)  // Rotate with not root
+        if (x->p->l == x)
+            x->p->l = left_ch;
+        else
+            x->p->r = left_ch;
+    x->r = left_ch->l;
+    if (left_ch->l != NULL) left_ch->l->p = x;
+    x->p = left_ch;
+    left_ch->l = x;
 }
 
-elem_t max_elem(Heap_tree & tree){
-	
+void left_rotate(Node *x) {
+    Node *right_ch = x->r;
+    right_ch->p = x->p;
+    if (x->p != NULL)  // Rotate with not root
+        if (x->p->l == x)
+            x->p->l = right_ch;
+        else
+            x->p->r = right_ch;
+    x->r = right_ch->l;
+    if (right_ch->l != NULL) right_ch->l->p = x;
+    x->p = right_ch;
+    right_ch->l = x;
 }
 
-void init_RB_tree(RB_tree & tree){
-	tree.root = make_NIL();
-	tree.size = 0;
-	return;
+void init_RB_tree(RB_tree &tree) {
+    tree.root = make_NIL();
+    tree.size = 0;
+    return;
 }
 
-Node * make_NIL(){
-	Node * ans = new Node;
-	ans->l = ans->r = ans->p = NULL;
-	ans->c = BLACK;
-	return ans;
+Node *make_NIL() {
+    Node *ans = new Node;
+    ans->l = ans->r = ans->p = NULL;
+    ans->c = BLACK;
+    ans->v = 0;
+    return ans;
 }
 
-void swap(elem_t & x, elem_t & y ){
-	elem_t tmp = x;
-	x = y;
-	y = tmp;
-	return;
+void swap(elem_t &x, elem_t &y) {
+    elem_t tmp = x;
+    x = y;
+    y = tmp;
+    return;
 }
-
-
-
