@@ -36,8 +36,8 @@ Node *get_uncle(Node *pointer);
 Node *get_bro(Node *pointer);
 void right_rotate(Node *x);
 void left_rotate(Node *x);
-Node* pull_left (Node *x);
-Node* pull_right (Node *x);
+Node *pull_left(Node *x);
+Node *pull_right(Node *x);
 
 int main() {
     RB_tree A;
@@ -55,80 +55,88 @@ int main() {
     return 0;
 }
 
-Node *get_min(Node *pointer){
-	if (pointer == NULL || is_NIL(pointer)) return NULL;
-	while (!is_NIL(pointer->l) ) pointer= pointer->l;
-	return pointer;
+Node *get_min(Node *pointer) {
+    if (pointer == NULL || is_NIL(pointer)) return NULL;
+    while (!is_NIL(pointer->l)) pointer = pointer->l;
+    return pointer;
 }
 
-Node *get_bro(Node *pointer){
-	if (pointer->p == NULL) return NULL;
-	if (pointer == pointer->p->l)
-		return pointer->p->r;
-	else
-		return pointer->p->l;
+Node *get_bro(Node *pointer) {
+    if (pointer->p == NULL) return NULL;
+    if (pointer == pointer->p->l)
+        return pointer->p->r;
+    else
+        return pointer->p->l;
 }
-Node * pull_left(Node *x){
-	Node * runner = x;
-	if (runner->p)
-	if (runner->p->l == runner)
-		runner->p->l = runner->l;
-	else 
-		runner->p->r = runner->l;
-	runner->l->p = runner->p;
-	Node * tmp = runner->l;
-	delete runner->r;
-	delete runner;
-	return tmp;
+Node *pull_left(Node *x) {
+    Node *runner = x;
+    if (runner->p)
+        if (runner->p->l == runner)
+            runner->p->l = runner->l;
+        else
+            runner->p->r = runner->l;
+    runner->l->p = runner->p;
+    Node *tmp = runner->l;
+    delete runner->r;
+    delete runner;
+    return tmp;
 }
-Node * pull_right (Node *x){
-	Node * runner = x;
-	if (runner->p)
-			if (runner->p->l == runner)
-				runner->p->l = runner->r;
-			else 
-				runner->p->r = runner->r;
-	runner->r->p = runner->p;
-	Node * tmp = runner->r;
-	delete runner->l;
-	delete runner;
-	return tmp;
+Node *pull_right(Node *x) {
+    Node *runner = x;
+    if (runner->p)
+        if (runner->p->l == runner)
+            runner->p->l = runner->r;
+        else
+            runner->p->r = runner->r;
+    runner->r->p = runner->p;
+    Node *tmp = runner->r;
+    delete runner->l;
+    delete runner;
+    return tmp;
 }
 
-void erase(RB_tree &tree, elem_t key){
-	Node * runner = tree.root;
-	while (!is_NIL(runner)) {
-		if (runner->v == key) break;
+void fix_node(Node *x) {
+    while (x != NULL) {
+        if (x->p == NULL) {
+            x->c = BLACK;
+            return;
+        }
+        Node *bro = get_bro(x);
+    }
+}
+
+void erase(RB_tree &tree, elem_t key) {
+    Node *runner = tree.root;
+    while (!is_NIL(runner)) {
+        if (runner->v == key) break;
         if (runner->v > key)
             runner = runner->l;
         else
             runner = runner->r;
     }
-	// Два случая оказаться здесь
-	if (is_NIL(runner)) return;
-	// runner смотрит на удаляемый узел
-	bool fix_flag = false;
-	if (runner->c == BLACK) fix_flag = true; 
-	if (is_NIL(runner->l) && is_NIL(runner->r)){ // Удалялся лист
-		delete runner->l;
-		delete runner->r;
-		runner->l = runner->r = NULL;
-		runner->v = NaV;
-		runner->c = BLACK;
-	}
-	if (!is_NIL(runner->l) && is_NIL(runner->r))// Слева есть справа нет
-		runner = pull_left(runner);
-	if (is_NIL(runner->l) && !is_NIL(runner->r))// Справа есть слева нет
-		runner = pull_right(runner);
-	
-	if (!is_NIL(runner->l) && !is_NIL(runner->r)){
-		Node * minimax = get_min (runner->r);
-		swap(runner->v,minimax->v);
-		runner = pull_right(minimax);
-	}
-	
-}
+    // Два случая оказаться здесь
+    if (is_NIL(runner)) return;
+    // runner смотрит на удаляемый узел
+    bool fix_flag = false;
+    if (runner->c == BLACK) fix_flag = true;
+    if (is_NIL(runner->l) && is_NIL(runner->r)) {  // Удалялся лист
+        delete runner->l;
+        delete runner->r;
+        runner->l = runner->r = NULL;
+        runner->v = NaV;
+        runner->c = BLACK;
+    }
+    if (!is_NIL(runner->l) && is_NIL(runner->r))  // Слева есть справа нет
+        runner = pull_left(runner);
+    if (is_NIL(runner->l) && !is_NIL(runner->r))  // Справа есть слева нет
+        runner = pull_right(runner);
 
+    if (!is_NIL(runner->l) && !is_NIL(runner->r)) {
+        Node *minimax = get_min(runner->r);
+        swap(runner->v, minimax->v);
+        runner = pull_right(minimax);
+    }
+}
 
 Node *get_grand_p(Node *pointer) {
     if ((pointer != NULL) && (pointer->p != NULL))
@@ -226,7 +234,8 @@ void insert(RB_tree &tree, elem_t key) {
             right_rotate(g);
         else
             left_rotate(g);
-        if (runner->p->p == NULL) tree.root = runner->p; // Обновление корня после поворота 
+        if (runner->p->p == NULL)
+            tree.root = runner->p;  // Обновление корня после поворота
         return;
     }
 }
