@@ -22,6 +22,7 @@ BNode *allocate_node() {
     x->p = NULL;
     x->n = 0;
     x->leaf = true;
+    return x;
 }
 
 void btree_create(BTree &T) {
@@ -75,27 +76,42 @@ void btree_insert_nonfull(BNode *x,
         x->n++;
     } else {  // х не листовой узел
         while (i >= 0 && key < x->k[i]) i--;
-        i++; // В x->c[i] нужно вставлять key
-        if( x->c[i]->n == 2*t-1){
-            btree_split_child(x,i);
+        i++;  // В x->c[i] нужно вставлять key
+        if (x->c[i]->n == 2 * t - 1) {
+            btree_split_child(x, i);
             if (key > x->k[i]) i++;
         }
-        btree_insert_nonfull(x->c[i],key);
+        btree_insert_nonfull(x->c[i], key);
     }
     return;
 }
 
-void btree_insert(BTree & T, elem_t key){
-    BNode * r= T.root;
-    if (r->n = 2*t-1){
-        BNode * s = allocate_node();
+void btree_insert(BTree &T, elem_t key) {
+    BNode *r = T.root;
+    if (r->n == 2 * t - 1) {
+        BNode *s = allocate_node();
         T.root = s;
         s->leaf = false;
         s->n = 0;
         s->c[0] = r;
-        btree_split_child(s,0);
-        btree_insert_nonfull(s,key);
-    }
-    else btree_insert_nonfull(r,key);
+        btree_split_child(s, 0);
+        btree_insert_nonfull(s, key);
+    } else
+        btree_insert_nonfull(r, key);
     return;
+}
+
+int main() { 
+    BTree T;
+    btree_create(T);
+    int x;
+    while (cin>>x){
+        auto p = btree_search(T.root,x);
+        if (p.first) printf("YES\n"); // cout<< "YES"<<endl;
+        else{
+            printf("NO\n"); // cout<<"NO"<<endl;
+            btree_insert(T,x);
+        }
+    }
+    return 0; 
 }
