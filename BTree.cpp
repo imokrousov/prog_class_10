@@ -25,6 +25,7 @@ BNode *allocate_node()
     x->p = NULL;
     x->n = 0;
     x->leaf = true;
+    for (int i =0; i < 2*t; i++) x->c[i] = NULL;
     return x;
 }
 
@@ -198,21 +199,56 @@ void btree_erase(BNode *x, elem_t key)
     }
 }
 
+int print_slice(BNode *root, int lvl)
+{
+    //cerr<<lvl<<endl;
+    if (root == NULL){
+        cout<<"NULL";
+        return 0;
+    }
+    if (root->n == 0 ) return 0;
+    if (lvl == 0)
+    {
+        cout << "(";
+        for (int i = 0; i < root->n; i++)
+            cout << root->k[i] << ' ';
+        cout << ") ";
+        return 1;
+    }
+    int sum = 0;
+    for (int i = 0; i <= root->n; i++)
+        sum += print_slice(root->c[i], lvl + 1);
+    return sum;
+}
+
+void print_lvl_tree(BNode *root)
+{
+    int i = 0;
+    while (print_slice(root, i++) != 0)
+    {
+        cout << endl;
+    }
+    cout << endl;
+    return;
+}
+
 int main()
 {
+    //4 58 43 13 9 42 74 39 88
     BTree T;
     btree_create(T);
-    int x;
-    while (cin >> x)
-    {
-        auto p = btree_search(T.root, x);
-        if (p.first)
-            printf("YES\n"); // cout<< "YES"<<endl;
-        else
-        {
-            printf("NO\n"); // cout<<"NO"<<endl;
-            btree_insert(T, x);
-        }
-    }
+    btree_insert(T,4); cout<<endl;
+    print_lvl_tree(T.root);
+    btree_insert(T,58); cout<<endl;
+    print_lvl_tree(T.root);
+        btree_insert(T,43); cout<<endl;
+    print_lvl_tree(T.root); 
+        btree_insert(T,13); cout<<endl;
+    print_lvl_tree(T.root);
+        btree_insert(T,9);cout<<endl;
+    print_lvl_tree(T.root);
+        btree_insert(T,42);cout<<endl;
+    print_lvl_tree(T.root);
+
     return 0;
 }
