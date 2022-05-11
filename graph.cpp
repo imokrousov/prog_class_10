@@ -15,9 +15,26 @@ struct Graph {
 	// vector<Edge> хранит набор ребер исходящих из вершины с номером i
 };
 
+void DFS (const Graph & G, vector<int> &C, int cur,
+			vector<int> &P, vector<pair<int,int>> &SE, int & time){
+	SE[cur].first = time++;
+	C[cur] = 1;
+	for (int i = 0; i < G.edges[cur].size(); i++){
+		int to = G.edges[cur][i].to;
+		if (C[to] == 0){
+			P[to] = cur;
+			DFS(G,C,to,P,SE,time);
+		}
+	}
+	SE[cur].second = time++;
+	C[cur]= 2;
+	return;
+}
+
+
 void printMatrix(const Graph & g);
 void printEdges(const Graph & g);
-void readEdges(const Graph & g);
+void readEdges( Graph & g);
 // 5 6       5 - количество вершин 6 - количество ребер
 // 1 3        - ребро из 1 в 3 и т.д.
 // 5 1
@@ -25,7 +42,7 @@ void readEdges(const Graph & g);
 // 3 1
 // 4 5
 // 1 6
-void readMatrix(const Graph & g);
+void readMatrix( Graph & g);
 // 3 - количество вершин
 // 0 1 1
 // 1 0 1
