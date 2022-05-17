@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -14,6 +15,31 @@ struct Graph {
 	vector<vector<Edge>> edges; // Внешний вектор отвечает за вершины
 	// vector<Edge> хранит набор ребер исходящих из вершины с номером i
 };
+
+void BFS (const Graph & G, vector<int> &C, 
+			vector<int> &P, vector<int> &D, int start)
+{
+	P[start] = -1;
+	D[start] = 0;
+	queue<int> Q;
+	Q.push(start);
+	C[start] = 1;
+	while (!Q.empty()){
+		int cur = Q.front();
+		Q.pop();
+		C[cur] = 2;
+		for (int i =0; i < G.edges[cur].size(); i++){
+			int to = G.edges[cur][i].to;
+			if (C[to] == 0){
+				C[to] = 1;
+				P[to] = cur;
+				D[to] = D[cur]+1;
+				Q.push(to);
+			}
+		}
+	}
+}
+
 
 void DFS (const Graph & G, vector<int> &C, int cur,
 			vector<int> &P, vector<pair<int,int>> &SE, int & time){
